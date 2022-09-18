@@ -94,4 +94,36 @@ const getPost = async (userId, limit, offset) => {
 
   return postCommentResponse;
 };
-module.exports = { createPost, getPost, commentPost, likePost };
+
+const getComment = async (limit, offset, postId) => {
+  const commentResponse = model.commentPostSchema.findAll({
+    offset: (offset - 1) * limit,
+    limit: limit * 1 || 100,
+    where: { postId: postId * 1 },
+  });
+
+  if (commentResponse.length === 0) {
+    object["comments"] = 0;
+  } else {
+    for (obj in commentResponse) {
+      const x = await model.user.findOne({
+        where: {
+          userId: commentResponse[0]["_previousDataValues"].commentedUserId,
+        },
+      });
+      obj[0]["commmentedBy"] = x["name"];
+      const { commentedUserId, commmentedBy, comment, postId, commentedOn } =
+        obj[0];
+
+      obj["comments"] = {
+        commentedUserId,
+        commmentedBy,
+        comment,
+        postId,
+        commentedOn,
+      };
+    }
+  }
+  return commentResponse;
+};
+module.exports = { getComment, createPost, getPost, commentPost, likePost };
