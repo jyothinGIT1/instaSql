@@ -43,4 +43,14 @@ const likePost = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { createPost, getPost, commentPost, likePost };
+const getComment = async (req, res, next) => {
+  try {
+    const { limit, offset } = req.query;
+    const postId = req.params.postId;
+    const getPostResponse = await postService.getComment(limit, offset, postId);
+    return successResponse(res, (data = { response: getPostResponse }));
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { createPost, getPost, commentPost, likePost, getComment };
