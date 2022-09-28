@@ -15,6 +15,7 @@ const userSchema = (sequelize, Sequelize) => {
       photo: { type: Sequelize.STRING, allowNull: true },
       DOB: { type: Sequelize.STRING, allowNull: false },
       createdOn: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
+      isBlocked: { type: Sequelize.BOOLEAN, defaultValue: false },
     },
     {
       // paranoid: true,

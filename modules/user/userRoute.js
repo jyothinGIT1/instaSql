@@ -10,6 +10,9 @@ const {
   followUser,
   followers,
   following,
+  followings1,
+  followers1,
+  deleteUser,
 } = require("./userController");
 const route = express.Router();
 
@@ -20,5 +23,9 @@ route.patch("/edit", autherizationMiddleware, multerMiddleware, edit);
 route.get("/get", autherizationMiddleware, getUser);
 route.get("/followers", autherizationMiddleware, followers);
 route.get("/following", autherizationMiddleware, following);
+route.delete("/delete", autherizationMiddleware, deleteUser);
+
+route.get("/followings1", autherizationMiddleware, followings1);
+route.get("/followers1", autherizationMiddleware, followers1);
 
 module.exports = route;

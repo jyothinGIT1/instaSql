@@ -16,7 +16,6 @@ app.use(cors());
 
 app.use(indexroute);
 app.use(errorHandler);
-// const { con } = require("./config/config");
 const db = require("./models");
 const port = process.env.PORT || 4000;
 

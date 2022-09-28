@@ -31,4 +31,47 @@ db.postSchema = require("./postModel.js")(sequelize, Sequelize);
 db.likePost = require("./likePost.js")(sequelize, Sequelize);
 db.commentPostSchema = require("./commentPost.js")(sequelize, Sequelize);
 
+db.userFollowerModel.hasOne(db.user, {
+  sourceKey: "followingId",
+  foreignKey: "userId",
+  as: "following",
+});
+db.userFollowerModel.hasOne(db.user, {
+  sourceKey: "followerId",
+  foreignKey: "userId",
+  as: "follower",
+});
+db.commentPostSchema.hasOne(db.user, {
+  sourceKey: "commentedUserId",
+  foreignKey: "userId",
+});
+db.postSchema.hasMany(db.likePost, {
+  sourceKey: "postId",
+  foreignKey: "postId",
+});
+db.postSchema.hasMany(db.commentPostSchema, {
+  sourceKey: "postId",
+  foreignKey: "postId",
+});
+
+db.user.hasMany(db.postSchema, {
+  sourceKey: "userId",
+  foreignKey: "postedUserId",
+  // onDelete: "CASCADE",
+});
+db.postSchema.hasMany(db.commentPostSchema, {
+  sourceKey: "postId",
+  foreignKey: "postId",
+  // onDelete: "CASCADE",
+});
+db.user.hasMany(db.userFollowerModel, {
+  sourceKey: "userId",
+  foreignKey: "followerId",
+  // onDelete: "CASCADE",
+});
+db.user.hasMany(db.userFollowerModel, {
+  sourceKey: "userId",
+  foreignKey: "followingId",
+  // onDelete: "CASCADE",
+});
 module.exports = db;

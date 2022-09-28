@@ -7,7 +7,7 @@ const commentPostSchema = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
       },
       postId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       comment: {
         type: Sequelize.STRING,

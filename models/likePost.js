@@ -3,10 +3,10 @@ const likePost = (sequelize, Sequelize) => {
     "likePost",
     {
       likedUserId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
       postId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
       },
     },
     {

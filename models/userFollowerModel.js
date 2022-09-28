@@ -3,14 +3,15 @@ const userFollowerModel = (sequelize, Sequelize) => {
     "userFollowerSchema",
     {
       followerId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
+        // foreignKey: true,
       },
       followingId: {
-        type: Sequelize.STRING,
+        // foreignKey: true,
+        type: Sequelize.INTEGER,
       },
     },
     {
-      // paranoid: true,
       timestamps: false,
       tableName: "userFollowerSchema",
     }

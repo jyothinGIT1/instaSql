@@ -3,8 +3,15 @@ const postSchema = (sequelize, Sequelize) => {
   const postSchema = sequelize.define(
     "postSchema",
     {
+      postId: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+      },
       postedUserId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
+        foreignKey: true,
       },
       filePath: {
         type: Sequelize.STRING,

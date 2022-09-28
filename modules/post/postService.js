@@ -3,22 +3,22 @@ const { verifyJWT } = require("../../utils/token");
 
 const createPost = async (userId, data) => {
   const postData = { postedUserId: userId, ...data };
-  const { id, filePath, description, postedUserId, postedOn } =
-    await model.postSchema.create(postData);
-  return { postId: id, filePath, description, postedUserId, postedOn };
+  const response = await model.postSchema.create(postData);
+  return 1;
+  // const { postId, filePath, description, postedUserId, postedOn } =
+  //   await model.postSchema.create(postData);
+
+  // return { postId , filePath, description, postedUserId, postedOn };
 };
 const commentPost = async (userId, data) => {
   const postData = { commentedUserId: userId, ...data };
   const postCommentResponse = await model.commentPostSchema.create(postData);
-  const { commentedUserId, comment, id } = postCommentResponse;
-  return {
-    commentedUserId: commentedUserId,
-    comment,
-    commentId: id,
-  };
+  // const { commentedUserId, comment, id } = postCommentResponse;
+  // console.log({ commentedUserId, comment, id });
+  return 1;
 };
 const likePost = async (userId, data) => {
-  const postData = { userId, ...data };
+  const postData = { likedUserId: userId, ...data };
   const postCommentResponse = await model.likePost.create(postData);
   const { id, postId, likedUserId } = postCommentResponse;
   return {
@@ -27,103 +27,52 @@ const likePost = async (userId, data) => {
     likeId: id,
   };
 };
-
 const getPost = async (userId, limit, offset) => {
-  let postCommentResponse = await model.postSchema.findAll({
-    offset: offset * 1 || 1,
+  const getPost = await model.postSchema.findAll({
+    offset: (offset - 1) * 1 || 0,
     limit: limit * 1 || 100,
     where: { postedUserId: userId },
-  });
-  let CommentResponse = [];
-  postCommentResponse.forEach((element) => {
-    CommentResponse.push({
-      postId: element["dataValues"].id,
-      filePath: element["dataValues"].filePath,
-      description: element["dataValues"].description,
-      postedOn: element["dataValues"].postedOn,
-    });
-  });
-  postCommentResponse = CommentResponse;
-  for (object of postCommentResponse) {
-    let postId = object.postId;
-    const count = await model.likePost.findAll({
-      where: { postId },
-      attributes: {
-        include: [[sequelize.fn("COUNT", sequelize.col("postId")), "count"]],
+    include: [
+      {
+        model: model.likePost,
+        group: "postId",
+        attributes: [[sequelize.fn("COUNT", sequelize.col("postId")), "count"]],
+        separate: true,
       },
-    });
-    object["likes"] = count[0]["dataValues"].count;
-    const commentResponse = await model.commentPostSchema.findAll({
-      where: { postId: object.postId },
-    });
-    if (commentResponse.length === 0) {
-      object["comments"] = 0;
-    } else {
-    }
-  }
+      {
+        model: model.commentPostSchema,
+        attributes: [[sequelize.fn("COUNT", sequelize.col("postId")), "count"]],
 
-  for (object of postCommentResponse) {
-    let postId = object.postId;
-    const commentResponse = await model.commentPostSchema.findAll({
-      where: { postId },
-    });
-    if (commentResponse.length === 0) {
-      object["comments"] = 0;
-    } else {
-      const x = await model.user.findOne({
-        where: {
-          userId: commentResponse[0]["_previousDataValues"].commentedUserId,
-        },
-      });
-      commentResponse[0]["commmentedBy"] = x["name"];
-      const { commentedUserId, commmentedBy, comment, postId, commentedOn } =
-        commentResponse[0];
-
-      object["comments"] = {
-        commentedUserId,
-        commmentedBy,
-        comment,
-        postId,
-        commentedOn,
-      };
-    }
-  }
-  if (postCommentResponse.length === 0) {
-    return 0;
-  }
-
-  return postCommentResponse;
+        group: "postId",
+        separate: true,
+      },
+    ],
+  });
+  return getPost;
 };
 
 const getComment = async (limit, offset, postId) => {
-  const commentResponse = model.commentPostSchema.findAll({
-    offset: (offset - 1) * limit,
+  const commentResponse = await model.commentPostSchema.findAll({
+    offset: (offset - 1) * limit || 0,
     limit: limit * 1 || 100,
     where: { postId: postId * 1 },
+    include: { model: model.user, attributes: ["name"] },
   });
-
-  if (commentResponse.length === 0) {
-    object["comments"] = 0;
-  } else {
-    for (obj in commentResponse) {
-      const x = await model.user.findOne({
-        where: {
-          userId: commentResponse[0]["_previousDataValues"].commentedUserId,
-        },
-      });
-      obj[0]["commmentedBy"] = x["name"];
-      const { commentedUserId, commmentedBy, comment, postId, commentedOn } =
-        obj[0];
-
-      obj["comments"] = {
-        commentedUserId,
-        commmentedBy,
-        comment,
-        postId,
-        commentedOn,
-      };
-    }
-  }
   return commentResponse;
 };
-module.exports = { getComment, createPost, getPost, commentPost, likePost };
+
+const deletePost = async (postId) => {
+  const commentResponse = await model.postSchema.destroy({
+    where: { postId: postId * 1 },
+  });
+  return commentResponse;
+};
+
+module.exports = {
+  getComment,
+  createPost,
+  getPost,
+  commentPost,
+  likePost,
+  deletePost,
+};

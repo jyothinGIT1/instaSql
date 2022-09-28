@@ -1,4 +1,3 @@
-const { response } = require("express");
 const model = require("../../models");
 const { hashPassword, comparePassword } = require("../../utils/bcrypt");
 const { createJWT } = require("../../utils/token");
@@ -59,38 +58,30 @@ const edit = async (userid, postData) => {
 const getUser = async (userId) => {
   const userResponse = await model.user.findOne({
     where: { userId: userId },
+    attributes: { exclude: ["password"] },
   });
-  delete userResponse["dataValues"]["password"];
-  // try {
   let response = await model.userFollowerModel.findAll({
     where: { followerId: userId },
     attributes: {
       include: [[sequelize.fn("COUNT", sequelize.col("followerId")), "count"]],
     },
   });
-  // } finally {
-  // }
   if (response[0]["dataValues"].count) {
     userResponse["dataValues"]["following"] = response[0]["dataValues"].count;
   } else {
     userResponse["dataValues"]["following"] = 0;
   }
-  // try {
   response = await model.userFollowerModel.findAll({
     where: { followingId: userId },
     attributes: {
       include: [[sequelize.fn("COUNT", sequelize.col("followingId")), "count"]],
     },
   });
-  // } finally {
-  // }
-
   if (response[0]["dataValues"].count) {
     userResponse["dataValues"]["followers"] = response[0]["dataValues"].count;
   } else {
     userResponse["dataValues"]["followers"] = 0;
   }
-  // try {
   response = await model.postSchema.findAll({
     where: { postedUserId: userId },
     attributes: {
@@ -99,8 +90,6 @@ const getUser = async (userId) => {
       ],
     },
   });
-  // } finally {
-  // }
   if (response[0]["dataValues"].count) {
     userResponse["dataValues"]["Posts"] = response[0]["dataValues"].count;
   } else {
@@ -110,7 +99,6 @@ const getUser = async (userId) => {
 };
 
 const followers = async (userId) => {
-  console.log(userId);
   const follower = await model.userFollowerModel.findAll({
     where: { followingId: userId },
   });
@@ -157,11 +145,39 @@ const following = async (userId) => {
       name: element["dataValues"].name,
     });
   });
-
   if (followingList.length === 0) {
     return 0;
   }
   return followingList;
+};
+
+const followings1 = async (userId) => {
+  const followings = await model.userFollowerModel.findAll({
+    where: { followerId: userId },
+    attributes: ["followingId"],
+    include: { model: model.user, attributes: ["name"], as: "following" },
+  });
+  if (followings.length === 0) {
+    return 0;
+  }
+  return followings;
+};
+const followers1 = async (userId) => {
+  const followings = await model.userFollowerModel.findAll({
+    where: { followingId: userId },
+    attributes: ["followerId"],
+    include: { model: model.user, attributes: ["name"], as: "follower" },
+  });
+  if (followings.length === 0) {
+    return 0;
+  }
+  return followings;
+};
+const deleteUser = async (userId) => {
+  const followings = await model.user.destroy({
+    where: { userId },
+  });
+  return followings;
 };
 module.exports = {
   register,
@@ -171,4 +187,7 @@ module.exports = {
   followUser,
   followers,
   following,
+  followings1,
+  followers1,
+  deleteUser,
 };

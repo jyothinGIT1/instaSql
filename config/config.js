@@ -31,7 +31,7 @@ module.exports = db;
 
 // module.exports = {
 //   //configuration for mysql
-//   HOST: "localhost",
+
 //   USER: "root",
 //   PASSWORD: "root",
 //   DB: "instagramSql",

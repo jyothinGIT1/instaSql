@@ -25,7 +25,6 @@ const getPost = async (req, res, next) => {
   try {
     const userId = req.user.userId;
     const { limit, offset } = req.query;
-    console.log(typeof offset);
     const getPostResponse = await postService.getPost(userId, limit, offset);
     return successResponse(res, (data = { response: getPostResponse }));
   } catch (error) {
@@ -53,4 +52,20 @@ const getComment = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { createPost, getPost, commentPost, likePost, getComment };
+const deletePost = async (req, res, next) => {
+  try {
+    const postId = req.params.postId;
+    const getPostResponse = await postService.deletePost(postId);
+    return successResponse(res, (data = { response: getPostResponse }));
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = {
+  createPost,
+  getPost,
+  commentPost,
+  likePost,
+  getComment,
+  deletePost,
+};

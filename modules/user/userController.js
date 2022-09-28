@@ -69,6 +69,27 @@ const following = async (req, res, next) => {
     return successResponse(res, (data = { response: followersResponse }));
   } catch (error) {}
 };
+const followings1 = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const followersResponse = await userService.followings1(userId);
+    return successResponse(res, (data = { response: followersResponse }));
+  } catch (error) {}
+};
+const followers1 = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const followersResponse = await userService.followers1(userId);
+    return successResponse(res, (data = { response: followersResponse }));
+  } catch (error) {}
+};
+const deleteUser = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const followersResponse = await userService.deleteUser(userId);
+    return successResponse(res, (data = { response: followersResponse }));
+  } catch (error) {}
+};
 module.exports = {
   register,
   edit,
@@ -77,4 +98,7 @@ module.exports = {
   followUser,
   followers,
   following,
+  followings1,
+  followers1,
+  deleteUser,
 };
